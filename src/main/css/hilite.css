@@ -1,0 +1,14 @@
+ i.mce-i-hilite:before {  
+    /* FONT-AWESOME-CONTENT e.g. "\f166" */
+    content: "\f166";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #111111;
+    font-size: 1.5em;
+    padding-right: 0.5em;
+    position: absolute;
+    top: 15%;
+    left: 0;
+ }
