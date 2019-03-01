@@ -1,2 +1,7 @@
+1.0.1
+  * Added style around code elements to prevent code element background-color from being overwritten.
+
 1.0.0
   * Initial release.
+
+

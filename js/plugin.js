@@ -1384,7 +1384,7 @@ var plugin = (function () {
           return '';
         }
         var spacedLine = startSpaceToNb(strLine);
-        return '<code>' + spacedLine.trim() + '</code>';
+        return '<code style="background-color:transparent;">' + spacedLine.trim() + '</code>';
       };
       var addLineNumbers = function (str, lightLineNum) {
         if (str === undefined) {

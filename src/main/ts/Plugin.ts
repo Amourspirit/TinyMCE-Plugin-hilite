@@ -516,7 +516,9 @@ const setup = (editor: any, url: string) => {
       return '';
     }
     const spacedLine = startSpaceToNb(strLine);
-    return '<code>' + spacedLine.trim() + '</code>';
+    // style is added because some sites like Evernote override the code style background color.
+    // with Evenote the style is only overwritten in noteview.
+    return '<code style="background-color:transparent;">' + spacedLine.trim() + '</code>';
   };
   const addLineNumbers = (str: string, lightLineNum: boolean): string => {
     if (str === undefined) {
