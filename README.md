@@ -13,19 +13,19 @@
 ## Screenshots
 
 **Menu and Toolbar**  
-[![tinymce-hilite03.png](https://i.postimg.cc/y629SxBR/tinymce-hilite03.png)](https://postimg.cc/3WCWsKkr)
+![tinymce-hilite03.png](https://i.postimg.cc/y629SxBR/tinymce-hilite03.png)
 
 **Many code languages supported**  
-[![tinymce-hilite04.png](https://i.postimg.cc/Qxb8ZY6M/tinymce-hilite04.png)](https://postimg.cc/nCXbv2f8)
+![tinymce-hilite04.png](https://i.postimg.cc/Qxb8ZY6M/tinymce-hilite04.png)
 
 **Paste in your code**  
-[![tinymce-hilite05.png](https://i.postimg.cc/nVWKYTKC/tinymce-hilite05.png)](https://postimg.cc/7bgTq3Wk)
+![tinymce-hilite05.png](https://i.postimg.cc/nVWKYTKC/tinymce-hilite05.png)
 
 **Results of Hilite**  
-[![tinymce-hilite06.png](https://i.postimg.cc/SNpFz5Rh/tinymce-hilite06.png)](https://postimg.cc/dDnSb5GH)
+![tinymce-hilite06.png](https://i.postimg.cc/SNpFz5Rh/tinymce-hilite06.png)
 
 **Result os Hilite with a different Style**  
-[![tinymce-hilite07.png](https://i.postimg.cc/Df1sgJvX/tinymce-hilite07.png)](https://postimg.cc/0r2b5NJk)
+![tinymce-hilite07.png](https://i.postimg.cc/Df1sgJvX/tinymce-hilite07.png)
 
 ### Installation
 
