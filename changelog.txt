@@ -1,7 +1,8 @@
+1.1.0
+  * Remove PRE element and replaced with DIV  
+  * Added more Style to elements.
 1.0.1
   * Added style around code elements to prevent code element background-color from being overwritten.
 
 1.0.0
   * Initial release.
-
-
