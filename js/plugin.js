@@ -1276,11 +1276,11 @@ var plugin = (function () {
                 if (e.data.linenos) {
                   addLineNum = true;
                 }
-                var lightNum = false;
+                var lightNum = true;
                 if (addLineNum === true) {
                   var styleItm = codeParams.style;
                   if (styleItm === 'fruity' || styleItm === 'monokai' || styleItm === 'native' || styleItm === 'rrt' || styleItm === 'vim') {
-                    lightNum = true;
+                    lightNum = false;
                   }
                 }
                 var result_1 = processCode(jsondata.value, addLineNum, lightNum);
@@ -1307,39 +1307,28 @@ var plugin = (function () {
         onclick: mainFunction
       });
       var processCode = function (strCode, addLineNum, lightLineNum) {
-        if (lightLineNum === void 0) {
-          lightLineNum = false;
-        }
-        var divCode = extractDivCode(strCode);
-        var divPre = getDivPre(divCode);
-        var innerCode = extractFormatedCode(divCode);
+        var divOpen = getDivOpen(strCode);
+        var pre = '<div style="overflow:visible;background-color:transparent;margin: 0;line-height: 1.3em;font-family: Monaco, Courier, monospace;">';
+        var divPre = divOpen + pre;
+        var innerCode = extractFormatedCode(strCode);
         var codeTaged = addCodeTags(innerCode);
         if (addLineNum !== false) {
           codeTaged = addLineNumbers(codeTaged, lightLineNum);
         }
-        var result = divPre + codeTaged + '</pre></div>';
+        codeTaged = addOutterDivElement(codeTaged);
+        var result = divPre + codeTaged + '</div></div>';
         return result;
       };
-      var getDivPre = function (html) {
+      var getDivOpen = function (html) {
         var startDivRegex = /(<div.*?>)/gm;
-        var startRegex = /(<pre.*?>)/gm;
         var divMatchStart = startDivRegex.exec(html);
-        var matchStart = startRegex.exec(html);
-        var endIndex = 0;
-        if (matchStart) {
-          endIndex = matchStart.index + matchStart[0].length;
-        }
-        var strCode = html.substr(divMatchStart.index, endIndex);
-        return strCode;
-      };
-      var extractDivCode = function (html) {
-        var startRegex = /(<div.*?>)/gm;
-        var matchStart = startRegex.exec(html);
         var startIndex = 0;
-        if (matchStart) {
-          startIndex = matchStart.index;
+        var endIndex = 0;
+        if (divMatchStart) {
+          startIndex = divMatchStart.index;
+          endIndex = divMatchStart.index + divMatchStart[0].length;
         }
-        var strCode = html.substr(startIndex);
+        var strCode = html.substr(startIndex, endIndex);
         return strCode;
       };
       var extractFormatedCode = function (html) {
@@ -1359,11 +1348,27 @@ var plugin = (function () {
         var strCode = html.substr(startIndex, len);
         return strCode;
       };
-      var addCodeTags = function (str) {
-        if (str === undefined) {
+      var addOutterDivElement = function (html) {
+        if (html === undefined) {
           return '';
         }
-        var lines = str.match(/^.*([\n\r]+|$)/gm);
+        var lines = html.match(/^.*([\n\r]+|$)/gm);
+        var arrayLength = lines.length;
+        var result = '';
+        var spanOpen = '<div style="white-space: nowrap;display:block;line-height: 1.3em;">';
+        var spanClose = '</div>\n';
+        if (arrayLength) {
+          for (var i = 0; i < arrayLength; i++) {
+            result += spanOpen + lines[i] + spanClose;
+          }
+          return result;
+        }
+      };
+      var addCodeTags = function (html) {
+        if (html === undefined) {
+          return '';
+        }
+        var lines = html.match(/^.*([\n\r]+|$)/gm);
         var arrayLength = lines.length;
         var result = '';
         if (arrayLength) {
@@ -1394,22 +1399,25 @@ var plugin = (function () {
         var arrayLength = lines.length;
         var result = '';
         var numStyle = '-webkit-user-select: none;user-select: none;-o-user-select:none;-webkit-touch-callout: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;';
-        numStyle += 'margin-right: 10px;';
+        numStyle += 'margin-right: 8px;';
         numStyle += 'min-width:28px;';
         numStyle += 'text-align: right;';
         numStyle += 'display: inline-block;';
+        numStyle += 'line-height: 1.3em;';
+        numStyle += 'padding-right:5px;';
         if (lightLineNum === true) {
-          numStyle += 'color: beige;';
+          numStyle += 'color: #626262;';
+        } else {
+          numStyle += 'color: #c9c9c9;';
         }
-        var numOpenTag = '<div style="' + numStyle + '">';
-        var outterTag = '<div style="white-space: nowrap;">';
+        var openTag = '<div style="' + numStyle + '">';
         var closeTag = '</div>';
         if (arrayLength) {
           for (var i = 0; i < arrayLength; i++) {
             var count = i + 1;
             var line = lines[i];
             if (line.length > 0) {
-              var codeLine = outterTag + numOpenTag + count + closeTag + line + closeTag + '\n';
+              var codeLine = openTag + count + closeTag + line;
               result += codeLine;
             }
           }

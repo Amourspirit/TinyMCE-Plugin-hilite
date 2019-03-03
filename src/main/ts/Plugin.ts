@@ -383,7 +383,7 @@ const setup = (editor: any, url: string) => {
             if (e.data.linenos) {
               addLineNum = true;
             }
-            let lightNum: boolean = false;
+            let lightNum: boolean = true;
             if (addLineNum === true) {
               const styleItm: string = codeParams.style;
               if (styleItm === 'fruity'
@@ -391,7 +391,7 @@ const setup = (editor: any, url: string) => {
                 || styleItm === 'native'
                 || styleItm === 'rrt'
                 || styleItm === 'vim') {
-                lightNum = true;
+                lightNum = false;
               }
             }
             const result: string = processCode(jsondata.value, addLineNum, lightNum);
@@ -420,52 +420,42 @@ const setup = (editor: any, url: string) => {
       context: 'insert',
       onclick: mainFunction
     });
-  const processCode = (strCode: string, addLineNum: boolean, lightLineNum: boolean = false): string => {
-    // make sure ware are getting only the <div ... </div> html
-    const divCode: string = extractDivCode(strCode);
+  const processCode = (strCode: string, addLineNum: boolean, lightLineNum: boolean): string => {
+    // var divCode = extractDivCode(strCode);
+    const divOpen: string = getDivOpen(strCode);
+    // divOpen = divOpen.replace('overflow:auto;',' overflow-x:scroll;');
     // get the <div><pre> part of the code to append later
-    const divPre: string = getDivPre(divCode);
+    const pre: string = '<div style="overflow:visible;background-color:transparent;margin: 0;line-height: 1.3em;font-family: Monaco, Courier, monospace;">';
+    // get the <div><pre> part of the code to append later
+    const divPre: string = divOpen + pre;
+
     // get the inner html of the pre tags
-    const innerCode: string = extractFormatedCode(divCode);
+    const innerCode: string = extractFormatedCode(strCode);
     // format inner code to add <code>...</code> tags
     let codeTaged: string = addCodeTags(innerCode);
 
     if (addLineNum !== false) {
       codeTaged = addLineNumbers(codeTaged, lightLineNum);
     }
+    codeTaged = addOutterDivElement(codeTaged); //  add span wrapper to each line
     // build the result and return
-    const result: string = divPre + codeTaged + '</pre></div>';
+    const result: string = divPre + codeTaged + '</div></div>';
     return result;
   };
-  // Gets Open tages Div and pre from source html
-  // return string with div and pre. pre
-  // result are similar to <div id="code" style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">
-  const getDivPre = (html: string): string => {
-    const startDivRegex = /(<div.*?>)/gm;
-    const startRegex = /(<pre.*?>)/gm;
-
+  // Gets Open elements Divfrom source html
+  // return string with div pre
+  // result are similar to <div id="code" style="background: #f8f8f8; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;">
+  const getDivOpen = (html: string) => {
+    const startDivRegex: RegExp = /(<div.*?>)/gm;
     const divMatchStart: RegExpExecArray = startDivRegex.exec(html);
-    const matchStart: RegExpExecArray = startRegex.exec(html);
 
+    let startIndex: number = 0;
     let endIndex: number = 0;
-    if (matchStart) {
-      endIndex = matchStart.index + matchStart[0].length;
+    if (divMatchStart) {
+      startIndex = divMatchStart.index;
+      endIndex = divMatchStart.index + divMatchStart[0].length;
     }
-    const strCode: string = html.substr(divMatchStart.index, endIndex);
-    return strCode;
-  };
-  // extracts div outer html from inputs string html
-  // return string
-  const extractDivCode = (html: string): string => {
-    const startRegex: RegExp = /(<div.*?>)/gm;
-
-    const matchStart: RegExpExecArray = startRegex.exec(html);
-    let startIndex = 0;
-
-    if (matchStart) {
-      startIndex = matchStart.index;
-    }
-    const strCode = html.substr(startIndex);
+    const strCode: string = html.substr(startIndex, endIndex);
     return strCode;
   };
   // extracts the inner html of pre as string from html contain pre tags
@@ -488,13 +478,31 @@ const setup = (editor: any, url: string) => {
     const strCode: string = html.substr(startIndex, len);
     return strCode;
   };
-  // Loops trhough each line of text and wraps them in <code>></code> tags.
+  // Loops through each line of text and wraps them in <span>></span> tags.
   // return a string.
-  const addCodeTags = (str): string => {
-    if (str === undefined) {
+  const addOutterDivElement = (html: string): string => {
+    if (html === undefined) {
       return '';
     }
-    const lines = str.match(/^.*([\n\r]+|$)/gm);
+    const lines: RegExpMatchArray = html.match(/^.*([\n\r]+|$)/gm);
+    const arrayLength: number = lines.length;
+    let result: string = '';
+    const spanOpen: string = '<div style="white-space: nowrap;display:block;line-height: 1.3em;">';
+    const spanClose: string = '</div>\n';
+    if (arrayLength) {
+      for (let i: number = 0; i < arrayLength; i++) {
+        result += spanOpen + lines[i] + spanClose;
+      }
+      return result;
+    }
+  };
+  // Loops trhough each line of text and wraps them in <code>></code> tags.
+  // return a string.
+  const addCodeTags = (html: string): string => {
+    if (html === undefined) {
+      return '';
+    }
+    const lines = html.match(/^.*([\n\r]+|$)/gm);
     const arrayLength = lines.length;
     let result = '';
     if (arrayLength) {
@@ -515,7 +523,7 @@ const setup = (editor: any, url: string) => {
     if (strLine.length === 0) {
       return '';
     }
-    const spacedLine = startSpaceToNb(strLine);
+    const spacedLine: string = startSpaceToNb(strLine);
     // style is added because some sites like Evernote override the code style background color.
     // with Evenote the style is only overwritten in noteview.
     return '<code style="background-color:transparent;">' + spacedLine.trim() + '</code>';
@@ -528,25 +536,30 @@ const setup = (editor: any, url: string) => {
     const arrayLength: number = lines.length;
     let result: string = '';
     let numStyle: string = '-webkit-user-select: none;user-select: none;-o-user-select:none;-webkit-touch-callout: none;-khtml-user-select: none;-moz-user-select: none;-ms-user-select: none;';
-    numStyle += 'margin-right: 10px;';
+    numStyle += 'margin-right: 8px;';
     numStyle += 'min-width:28px;';
     numStyle += 'text-align: right;';
     numStyle += 'display: inline-block;';
+    numStyle += 'line-height: 1.3em;';
+    numStyle += 'padding-right:5px;';
+    // numStyle += 'border:solid gray;border-width:0 .1em 0 0;';
+    // numStyle += 'display: inline;';
+    // numStyle += 'float:left;';
     if (lightLineNum === true) {
-      numStyle += 'color: beige;';
+      numStyle += 'color: #626262;';
+      // numStyle += 'background-color:#f7f7f7;'
+    } else {
+      numStyle += 'color: #c9c9c9;';
+      // numStyle += 'background-color:#2b2b2b;'
     }
-    const numOpenTag: string = '<div style="' + numStyle + '">';
-    // const lineOpenTag: string = '<div style="display: inline-block;">';
-    const outterTag: string = '<div style="white-space: nowrap;">';
+    const openTag: string = '<div style="' + numStyle + '">';
     const closeTag: string = '</div>';
-
     if (arrayLength) {
-      for (let i = 0; i < arrayLength; i++) {
+      for (let i: number = 0; i < arrayLength; i++) {
         const count: number = i + 1;
         const line: string = lines[i];
         if (line.length > 0) {
-          // line = lineOpenTag + line + closeTag;
-          const codeLine: string = outterTag + numOpenTag + count + closeTag + line + closeTag + '\n';
+          const codeLine: string = openTag + count + closeTag + line;
           result += codeLine;
         }
       }
